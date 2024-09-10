@@ -1,7 +1,13 @@
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from movie_app.models import Director, Movie, Review
-from movie_app.serializers import DirectorSerializer, MovieSerializer, ReviewSerializer
+from movie_app.serializers import (
+    DirectorSerializer,
+    DirectorDetailSerializer,
+    MovieReviewSerializer,
+    MovieDetailSerializer,
+    ReviewSerializer,
+    ReviewDetailSerializer)
 from rest_framework import status
 
 
@@ -19,14 +25,14 @@ def director_detail_view(request, id):
     except Director.DoesNotExist:
         return Response(status=status.HTTP_404_NOT_FOUND,
                         data={'Error': 'The director has not been found!'})
-    data = DirectorSerializer(director, many=False).data
+    data = DirectorDetailSerializer(director, many=False).data
     return Response(data=data, status=status.HTTP_200_OK)
 
 
 @api_view(['GET'])
-def movie_view(request):
+def movie_review_view(request):
     movies = Movie.objects.all()
-    data = MovieSerializer(movies, many=True).data
+    data = MovieReviewSerializer(movies, many=True).data
     return Response(data=data, status=status.HTTP_200_OK)
 
 
@@ -37,7 +43,7 @@ def movie_detail_view(request, id):
     except Movie.DoesNotExist:
         return Response(status=status.HTTP_404_NOT_FOUND,
                         data={'Error': 'The movie has not been found!'})
-    data = MovieSerializer(movie, many=False).data
+    data = MovieDetailSerializer(movie, many=False).data
     return Response(data=data, status=status.HTTP_200_OK)
 
 
@@ -55,5 +61,5 @@ def review_detail_view(request, id):
     except Review.DoesNotExist:
         return Response(status=status.HTTP_404_NOT_FOUND,
                         data={'Error': 'The review has not been found!'})
-    data = ReviewSerializer(review, many=False).data
+    data = ReviewDetailSerializer(review, many=False).data
     return Response(data=data, status=status.HTTP_200_OK)
