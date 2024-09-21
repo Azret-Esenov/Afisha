@@ -1,5 +1,6 @@
 from rest_framework import serializers
 from movie_app.models import Director, Movie, Tag, Review
+from rest_framework.exceptions import ValidationError
 
 
 class DirectorSerializer(serializers.ModelSerializer):
@@ -19,6 +20,10 @@ class DirectorDetailSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 
+class DirectorValidateSerializer(serializers.Serializer):
+    name = serializers.CharField(min_length=2, max_length=120)
+
+
 class TagSerializer(serializers.ModelSerializer):
     class Meta:
         model = Tag
@@ -35,6 +40,19 @@ class ReviewDetailSerializer(serializers.ModelSerializer):
     class Meta:
         model = Review
         fields = '__all__'
+
+
+class ReviewValidateSerializer(serializers.Serializer):
+    text = serializers.CharField()
+    stars = serializers.IntegerField()
+    movie_id = serializers.IntegerField()
+
+    def validate_movie_id(self, movie_id):
+        try:
+            Movie.objects.get(id=movie_id)
+        except:
+            raise ValidationError('Movie does not exist.')
+        return movie_id
 
 
 class MovieReviewSerializer(serializers.ModelSerializer):
@@ -67,3 +85,23 @@ class MovieDetailSerializer(serializers.ModelSerializer):
     def get_tags(self, movie):
         return [tag.name for tag in movie.tags.all()]
 
+
+class MovieValidateSerializer(serializers.Serializer):
+    title = serializers.CharField(min_length=2, max_length=100)
+    description = serializers.CharField()
+    duration = serializers.FloatField(min_value=1, max_value=10000)
+    director_id = serializers.IntegerField()
+    tags = serializers.ListField(child=serializers.IntegerField(min_value=1))
+
+    def validate_director_id(self, director_id):
+        try:
+            Director.objects.get(id=director_id)
+        except:
+            raise ValidationError('Director does not exist.')
+        return director_id
+
+    def validate_tags(self, tags):
+        tags_from_db = Tag.objects.filter(id__in=tags)
+        if len(tags_from_db) != len(tags):
+            raise ValidationError('Invalid tags.')
+        return tags
