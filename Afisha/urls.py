@@ -27,4 +27,12 @@ urlpatterns = [
     path('api/v1/reviews/', views.review_view),
     path('api/v1/reviews/<int:id>/', views.review_detail_view),
     path('api/v1/users/', include('users.urls')),
+    path('directors/', views.DirectorListAPIView.as_view()),
+    path('movies/', views.MovieListAPIView.as_view()),
+    path('reviews/', views.ReviewListAPIView.as_view()),
+    path('directors/<int:id>/', views.DirectorDetailAPIView.as_view()),
+    path('movies/<int:id>/', views.MovieDetailAPIView.as_view()),
+    path('reviews/<int:id>/', views.ReviewDetailAPIView.as_view()),
+    path('tags/', views.TagViewSet.as_view({'get': 'list', 'post': 'create'})),
+    path('tags/<int:id>/', views.TagViewSet.as_view({'get': 'retrieve', 'put': 'update', 'delete': 'destroy'})),
 ]

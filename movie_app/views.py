@@ -1,6 +1,6 @@
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.response import Response
-from movie_app.models import Director, Movie, Review
+from movie_app.models import Director, Movie, Review, Tag
 from movie_app.serializers import (
     DirectorSerializer,
     DirectorDetailSerializer,
@@ -13,10 +13,26 @@ from movie_app.serializers import (
     ReviewValidateSerializer,)
 from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
+from rest_framework.generics import ListCreateAPIView, RetrieveUpdateDestroyAPIView
+from movie_app.serializers import DirectorSerializer, MovieReviewSerializer, ReviewSerializer, TagSerializer
+from rest_framework.pagination import PageNumberPagination
+from rest_framework.viewsets import ModelViewSet
+
+
+class TagViewSet(ModelViewSet):
+    serializer_class = TagSerializer
+    queryset = Tag.objects.all()
+    pagination_class = PageNumberPagination
+    lookup_field = 'id'
+
+
+class DirectorListAPIView(ListCreateAPIView):
+    serializer_class = DirectorSerializer
+    queryset = Director.objects.all()
+    pagination_class = PageNumberPagination
 
 
 @api_view(['GET', 'POST'])
-@permission_classes([IsAuthenticated])
 def director_view(request):
     if request.method == 'GET':
         directors = Director.objects.all()
@@ -31,8 +47,13 @@ def director_view(request):
         return Response(status=status.HTTP_201_CREATED, data=DirectorSerializer(director).data)
 
 
+class DirectorDetailAPIView(RetrieveUpdateDestroyAPIView):
+    serializer_class = DirectorSerializer
+    queryset = Director.objects.all()
+    lookup_field = 'id'
+
+
 @api_view(['GET', 'PUT', 'DELETE'])
-@permission_classes([IsAuthenticated])
 def director_detail_view(request, id):
     try:
         director = Director.objects.get(id=id)
@@ -54,8 +75,13 @@ def director_detail_view(request, id):
         return Response(status=status.HTTP_204_NO_CONTENT)
 
 
+class MovieListAPIView(ListCreateAPIView):
+    serializer_class = MovieReviewSerializer
+    queryset = Movie.objects.all()
+    pagination_class = PageNumberPagination
+
+
 @api_view(['GET', 'POST'])
-@permission_classes([IsAuthenticated])
 def movie_review_view(request):
     if request.method == 'GET':
         movies = Movie.objects.all()
@@ -81,8 +107,13 @@ def movie_review_view(request):
         return Response(status=status.HTTP_201_CREATED, data=MovieReviewSerializer(movie).data)
 
 
+class MovieDetailAPIView(RetrieveUpdateDestroyAPIView):
+    serializer_class = MovieReviewSerializer
+    queryset = Movie.objects.all()
+    lookup_field = 'id'
+
+
 @api_view(['GET', 'PUT', 'DELETE'])
-@permission_classes([IsAuthenticated])
 def movie_detail_view(request, id):
     try:
         movie = Movie.objects.get(id=id)
@@ -108,8 +139,13 @@ def movie_detail_view(request, id):
         return Response(status=status.HTTP_204_NO_CONTENT)
 
 
+class ReviewListAPIView(ListCreateAPIView):
+    serializer_class = ReviewSerializer
+    queryset = Review.objects.all()
+    pagination_class = PageNumberPagination
+
+
 @api_view(['GET', 'POST'])
-@permission_classes([IsAuthenticated])
 def review_view(request):
     if request.method == 'GET':
         reviews = Review.objects.all()
@@ -131,8 +167,13 @@ def review_view(request):
         return Response(status=status.HTTP_201_CREATED, data=ReviewSerializer(review).data)
 
 
+class ReviewDetailAPIView(RetrieveUpdateDestroyAPIView):
+    serializer_class = ReviewSerializer
+    queryset = Review.objects.all()
+    lookup_field = 'id'
+
+
 @api_view(['GET', 'PUT', 'DELETE'])
-@permission_classes([IsAuthenticated])
 def review_detail_view(request, id):
     try:
         review = Review.objects.get(id=id)
